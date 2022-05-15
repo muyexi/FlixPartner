@@ -11,10 +11,10 @@ export const TableView = observer(function TableView(props: TableViewProps) {
   const { list } = props
 
   const [sortDescending, setSortDescending] = useState<boolean>(null)
-  const [sortKey, setSortKey] = useState<string>("")
+  const [sortKey, setSortKey] = useState<string>(null)
 
   const sortedList = list.slice().sort((item1, item2) => {
-    if (sortKey == "") {
+    if (sortKey == null) {
       return 0
     }
 
