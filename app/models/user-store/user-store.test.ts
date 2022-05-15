@@ -23,7 +23,7 @@ test("can be created", () => {
   expect(instance).toBeTruthy()
 })
 
-test("1 hour cache expired after 61 minutes", async () => {
+test("cache expired after 1 hour", async () => {
   var mockStaticF = jest.fn().mockReturnValue(USER_ARRAY1)
   ApiClient.fetchUsers = mockStaticF
   const store = UserStoreModel.create({})
@@ -35,7 +35,7 @@ test("1 hour cache expired after 61 minutes", async () => {
   expect(store.users).toEqual(USER_ARRAY1)
   expect(expired).toBe(false)
 
-  jest.useFakeTimers("modern").setSystemTime(moment().add(30, "minutes").valueOf())
+  jest.useFakeTimers("modern").setSystemTime(moment().add(30 * 60, "seconds").valueOf())
 
   // Loaded from cache
   await store.getUsers()
@@ -44,7 +44,7 @@ test("1 hour cache expired after 61 minutes", async () => {
   expect(store.users).toEqual(USER_ARRAY1)
   expect(expired).toBe(false)
 
-  jest.useFakeTimers("modern").setSystemTime(moment().add(31, "minutes").valueOf())
+  jest.useFakeTimers("modern").setSystemTime(moment().add(30 * 60 + 1, "seconds").valueOf())
 
   // Cache expired
   expired = await store.isCacheExpired()

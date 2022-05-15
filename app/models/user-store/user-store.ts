@@ -28,10 +28,10 @@ export const UserStoreModel = types
       console.log("Timestamp:", timestamp)
 
       if (timestamp) {
-        const minutesAgo = moment().diff(moment.unix(timestamp), "minutes")
-        console.log(minutesAgo, "minutes ago")
+        const secondsAgo = moment().diff(moment.unix(timestamp), "seconds")
+        console.log(secondsAgo, "seconds ago")
 
-        return minutesAgo > 60
+        return secondsAgo > 60 * 60
       } else {
         return true
       }
