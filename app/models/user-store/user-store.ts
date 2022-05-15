@@ -1,4 +1,5 @@
 import { Instance, SnapshotOut, types } from "mobx-state-tree"
+import { values } from "mobx"
 import { UserModel, UserSnapshot } from "../user/user"
 import { ApiClient } from "../../services/api/api-client"
 import { withEnvironment } from "../extensions/with-environment"
@@ -10,11 +11,25 @@ export const UserStoreModel = types
   .model("UserStore")
   .props({
     users: types.optional(types.array(UserModel), []),
+    query: types.optional(types.string, ""),
   })
   .extend(withEnvironment)
+  .views((self) => ({
+    get filteredUsers() {
+      const users = values(self.users).filter((user) => {
+        return user.name.includes(self.query) || user.age.toString().includes(self.query)
+      })
+
+      console.log("filteredUsers: ", users)
+      return users
+    },
+  }))
   .actions((self) => ({
     saveUsers: (snapshots: UserSnapshot[]) => {
       self.users.replace(snapshots)
+    },
+    setQuery(query) {
+      self.query = query
     },
   }))
   .actions((self) => ({
@@ -45,7 +60,7 @@ const isCacheExpired = async (): Promise<Boolean> => {
 
     return minutesAgo > 60
   } else {
-    return false
+    return true
   }
 }
 

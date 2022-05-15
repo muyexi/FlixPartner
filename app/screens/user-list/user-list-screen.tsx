@@ -1,4 +1,4 @@
-import React, { useEffect, FC } from "react"
+import React, { useEffect, useState, useCallback, FC } from "react"
 import { observer } from "mobx-react-lite"
 import { TextStyle, ViewStyle } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
@@ -6,6 +6,8 @@ import { NavigatorParamList } from "../../navigators"
 import { Screen, Header, TableView } from "../../components"
 import { useStores } from "../../models"
 import { color, spacing } from "../../theme"
+import { TextInput } from "react-native-paper"
+import { debounce } from "lodash"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.white,
@@ -28,7 +30,9 @@ const HEADER_TITLE: TextStyle = {
 
 export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">> = observer(() => {
   const { userStore } = useStores()
-  const { users } = userStore
+  const { users, filteredUsers } = userStore
+
+  const [text, setText] = useState<string>("")
 
   useEffect(() => {
     fetchData()
@@ -38,21 +42,37 @@ export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">
     await userStore.getUsers()
   }
 
-  const search = () => {}
+  const debouncedFilter = useCallback(
+    debounce((query) => {
+      userStore.setQuery(query)
+      console.log("search: ", query)
+    }, 500),
+    [],
+  )
 
   return (
     <Screen style={ROOT} preset="scroll">
       <Header
         headerTx="userListScreen.title"
-        leftIcon="refresh"
-        onLeftPress={fetchData}
-        rightIcon="search"
-        onRightPress={search}
+        rightIcon="refresh"
+        onRightPress={fetchData}
         style={HEADER}
         titleStyle={HEADER_TITLE}
       />
+      <TextInput
+        label="Search"
+        value={text}
+        dense={true}
+        clearButtonMode="always"
+        clearTextOnFocus={true}
+        autoComplete={false}
+        onChangeText={(text) => {
+          setText(text)
+          debouncedFilter(text)
+        }}
+      />
 
-      <TableView list={users} />
+      <TableView list={text == "" ? users : filteredUsers} />
     </Screen>
   )
 })
