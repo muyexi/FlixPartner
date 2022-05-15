@@ -56,10 +56,14 @@ export const UserStoreModel = types
 
         await save("UserStore", users)
         await save("UserStoreTime", moment().unix())
+
+        return users
       } else {
         const users = await load("UserStore")
         self.saveUsers(users)
         console.log("Loaded from cache")
+
+        return users
       }
     },
   }))

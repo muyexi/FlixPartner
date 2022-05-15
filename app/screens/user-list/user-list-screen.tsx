@@ -9,6 +9,7 @@ import { color, spacing } from "../../theme"
 import { TextInput } from "react-native-paper"
 import { debounce } from "lodash"
 import { StatusBar } from "react-native"
+import { ActivityIndicator, Colors } from "react-native-paper"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.white,
@@ -20,6 +21,7 @@ const HEADER: TextStyle = {
   paddingHorizontal: spacing[4],
   paddingTop: spacing[3],
 }
+
 const HEADER_TITLE: TextStyle = {
   fontSize: 12,
   fontWeight: "bold",
@@ -29,18 +31,27 @@ const HEADER_TITLE: TextStyle = {
   textAlign: "center",
 }
 
+const LOADING: ViewStyle = {
+  paddingBottom: spacing[3],
+  paddingTop: spacing[3],
+}
+
 export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">> = observer(() => {
   const { userStore } = useStores()
   const { users, filteredUsers } = userStore
 
   const [text, setText] = useState<string>("")
+  const [loading, setLoading] = useState<boolean>(false)
 
   useEffect(() => {
     fetchData()
   }, [])
 
   async function fetchData() {
-    await userStore.getUsers()
+    setLoading(true)
+    userStore.getUsers().then((users) => {
+      setTimeout(() => setLoading(false), 1500)
+    })
   }
 
   const debouncedFilter = useCallback(
@@ -53,7 +64,7 @@ export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">
 
   return (
     <Screen style={ROOT} preset="scroll">
-      <StatusBar backgroundColor='blue' barStyle='dark-content' />
+      <StatusBar backgroundColor="blue" barStyle="dark-content" />
       <Header
         headerTx="userListScreen.title"
         rightIcon="refresh"
@@ -74,6 +85,7 @@ export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">
         }}
       />
 
+      {loading && <ActivityIndicator animating={true} color={Colors.red800} style={LOADING} />}
       <TableView list={text == "" ? users : filteredUsers} />
     </Screen>
   )

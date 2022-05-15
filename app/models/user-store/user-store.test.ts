@@ -35,7 +35,11 @@ test("cache expired after 1 hour", async () => {
   expect(store.users).toEqual(USER_ARRAY1)
   expect(expired).toBe(false)
 
-  jest.useFakeTimers("modern").setSystemTime(moment().add(30 * 60, "seconds").valueOf())
+  jest.useFakeTimers("modern").setSystemTime(
+    moment()
+      .add(30 * 60, "seconds")
+      .valueOf(),
+  )
 
   // Loaded from cache
   await store.getUsers()
@@ -44,7 +48,11 @@ test("cache expired after 1 hour", async () => {
   expect(store.users).toEqual(USER_ARRAY1)
   expect(expired).toBe(false)
 
-  jest.useFakeTimers("modern").setSystemTime(moment().add(30 * 60 + 1, "seconds").valueOf())
+  jest.useFakeTimers("modern").setSystemTime(
+    moment()
+      .add(30 * 60 + 1, "seconds")
+      .valueOf(),
+  )
 
   // Cache expired
   expired = await store.isCacheExpired()
