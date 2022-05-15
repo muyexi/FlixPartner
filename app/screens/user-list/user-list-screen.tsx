@@ -8,6 +8,7 @@ import { useStores } from "../../models"
 import { color, spacing } from "../../theme"
 import { TextInput } from "react-native-paper"
 import { debounce } from "lodash"
+import { StatusBar } from "react-native"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.white,
@@ -52,6 +53,7 @@ export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">
 
   return (
     <Screen style={ROOT} preset="scroll">
+      <StatusBar backgroundColor='blue' barStyle='dark-content' />
       <Header
         headerTx="userListScreen.title"
         rightIcon="refresh"
