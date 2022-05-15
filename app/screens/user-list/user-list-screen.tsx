@@ -1,6 +1,6 @@
 import React, { useEffect, FC } from "react"
 import { observer } from "mobx-react-lite"
-import { TextStyle, ViewStyle, View } from "react-native"
+import { TextStyle, ViewStyle } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { NavigatorParamList } from "../../navigators"
 import { Screen, Header, TableView } from "../../components"
@@ -26,34 +26,33 @@ const HEADER_TITLE: TextStyle = {
   textAlign: "center",
 }
 
-export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">> = observer(
-  ({ navigation }) => {
-    const goBack = () => navigation.goBack()
+export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">> = observer(() => {
+  const { userStore } = useStores()
+  const { users } = userStore
 
-    const { userStore } = useStores()
-    const { users } = userStore
+  useEffect(() => {
+    fetchData()
+  }, [])
 
-    useEffect(() => {
-      async function fetchData() {
-        await userStore.getUsers()
-      }
+  async function fetchData() {
+    await userStore.getUsers()
+  }
 
-      fetchData()
-      console.log("users: ", users)
-    }, [])
+  const search = () => {}
 
-    return (
-      <Screen style={ROOT} preset="scroll">
-        <Header
-          headerTx="userListScreen.title"
-          leftIcon="back"
-          onLeftPress={goBack}
-          style={HEADER}
-          titleStyle={HEADER_TITLE}
-        />
+  return (
+    <Screen style={ROOT} preset="scroll">
+      <Header
+        headerTx="userListScreen.title"
+        leftIcon="refresh"
+        onLeftPress={fetchData}
+        rightIcon="search"
+        onRightPress={search}
+        style={HEADER}
+        titleStyle={HEADER_TITLE}
+      />
 
-        <TableView list={users} />
-      </Screen>
-    )
-  },
-)
+      <TableView list={users} />
+    </Screen>
+  )
+})
