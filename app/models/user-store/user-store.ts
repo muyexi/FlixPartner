@@ -2,6 +2,9 @@ import { Instance, SnapshotOut, types } from "mobx-state-tree"
 import { UserModel, UserSnapshot } from "../user/user"
 import { ApiClient } from "../../services/api/api-client"
 import { withEnvironment } from "../extensions/with-environment"
+import { save, load } from "../../utils/storage"
+
+const moment = require("moment")
 
 export const UserStoreModel = types
   .model("UserStore")
@@ -16,10 +19,35 @@ export const UserStoreModel = types
   }))
   .actions((self) => ({
     getUsers: async () => {
-      const users = await ApiClient.fetchUsers()
-      self.saveUsers(users)
+      const expired = await isCacheExpired()
+      if (expired) {
+        const users = await ApiClient.fetchUsers()
+        self.saveUsers(users)
+        console.log("users: ", users)
+
+        await save("UserStore", users)
+        await save("UserStoreTime", moment().unix())
+      } else {
+        const users = await load("UserStore")
+        self.saveUsers(users)
+        console.log("Loaded from cache")
+      }
     },
   }))
+
+const isCacheExpired = async (): Promise<Boolean> => {
+  const timestamp = await load("UserStoreTime")
+  console.log("Timestamp:", timestamp)
+
+  if (timestamp) {
+    const minutesAgo = moment().diff(moment.unix(timestamp), "minutes")
+    console.log(minutesAgo, "minutes ago")
+
+    return minutesAgo > 60
+  } else {
+    return false
+  }
+}
 
 type UserStoreType = Instance<typeof UserStoreModel>
 export interface UserStore extends UserStoreType {}

@@ -95,6 +95,7 @@
     "jest-expo": "^44.0.1",
     "jetifier": "1.6.6",
     "lodash": "^4.17.21",
+    "moment": "^2.29.3",
     "patch-package": "6.2.2",
     "postinstall-prepare": "1.0.1",
     "prettier": "2.2.1",
