@@ -23,6 +23,19 @@ export const UserStoreModel = types
       console.log("filteredUsers: ", users)
       return users
     },
+    isCacheExpired: async () => {
+      const timestamp = await load("UserStoreTime")
+      console.log("Timestamp:", timestamp)
+
+      if (timestamp) {
+        const minutesAgo = moment().diff(moment.unix(timestamp), "minutes")
+        console.log(minutesAgo, "minutes ago")
+
+        return minutesAgo > 60
+      } else {
+        return true
+      }
+    },
   }))
   .actions((self) => ({
     saveUsers: (snapshots: UserSnapshot[]) => {
@@ -34,7 +47,8 @@ export const UserStoreModel = types
   }))
   .actions((self) => ({
     getUsers: async () => {
-      const expired = await isCacheExpired()
+      const expired = await self.isCacheExpired()
+
       if (expired) {
         const users = await ApiClient.fetchUsers()
         self.saveUsers(users)
@@ -49,20 +63,6 @@ export const UserStoreModel = types
       }
     },
   }))
-
-const isCacheExpired = async (): Promise<Boolean> => {
-  const timestamp = await load("UserStoreTime")
-  console.log("Timestamp:", timestamp)
-
-  if (timestamp) {
-    const minutesAgo = moment().diff(moment.unix(timestamp), "minutes")
-    console.log(minutesAgo, "minutes ago")
-
-    return minutesAgo > 60
-  } else {
-    return true
-  }
-}
 
 type UserStoreType = Instance<typeof UserStoreModel>
 export interface UserStore extends UserStoreType {}
