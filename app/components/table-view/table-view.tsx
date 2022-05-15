@@ -28,9 +28,10 @@ export const TableView = observer(function TableView(props: TableViewProps) {
   return (
     <DataTable>
       {list.length > 0 && (
-        <DataTable.Header>
+        <DataTable.Header key={"header"}>
           {Object.entries(list[0]).map(([key, value]) => (
             <DataTable.Title
+              key={key}
               numeric={isNumber(value)}
               sortDirection={sortDescending == false ? "ascending" : "descending"}
               onPress={() => {
@@ -49,10 +50,12 @@ export const TableView = observer(function TableView(props: TableViewProps) {
         </DataTable.Header>
       )}
 
-      {sortedList.map((item) => (
-        <DataTable.Row>
-          {Object.values(item).map((value) => (
-            <DataTable.Cell numeric={isNumber(value)}>{value}</DataTable.Cell>
+      {sortedList.map((item, index) => (
+        <DataTable.Row key={index}>
+          {Object.values(item).map((value, index) => (
+            <DataTable.Cell key={index} numeric={isNumber(value)}>
+              {value}
+            </DataTable.Cell>
           ))}
         </DataTable.Row>
       ))}
