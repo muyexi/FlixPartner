@@ -89,6 +89,7 @@ const FOOTER_CONTENT: ViewStyle = {
 export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> = observer(
   ({ navigation }) => {
     const nextScreen = () => navigation.navigate("demo")
+    const userListScreen = () => navigation.navigate("demo")
 
     return (
       <View testID="WelcomeScreen" style={FULL}>
@@ -110,6 +111,14 @@ export const WelcomeScreen: FC<StackScreenProps<NavigatorParamList, "welcome">> 
             For everyone else, this is where you'll see a live preview of your fully functioning app
             using Ignite.
           </Text>
+
+          <Button
+            testID="next-screen-button"
+            style={CONTINUE}
+            textStyle={CONTINUE_TEXT}
+            tx="welcomeScreen.userList"
+            onPress={() => navigation.navigate("userList")}
+          />
         </Screen>
         <SafeAreaView style={FOOTER}>
           <View style={FOOTER_CONTENT}>
