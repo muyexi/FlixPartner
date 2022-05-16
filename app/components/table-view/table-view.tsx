@@ -33,7 +33,7 @@ export const TableView = observer(function TableView(props: TableViewProps) {
             <DataTable.Title
               key={key}
               numeric={isNumber(value)}
-              sortDirection={sortDescending == false ? "ascending" : "descending"}
+              sortDirection={sortDescending === false ? "ascending" : "descending"}
               onPress={() => {
                 if (sortDescending == null) {
                   setSortDescending(true)

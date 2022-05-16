@@ -24,13 +24,13 @@ test("can be created", () => {
 })
 
 test("cache expired after 1 hour", async () => {
-  var mockStaticF = jest.fn().mockReturnValue(USER_ARRAY1)
+  let mockStaticF = jest.fn().mockReturnValue(USER_ARRAY1)
   ApiClient.fetchUsers = mockStaticF
   const store = UserStoreModel.create({})
 
   // Cache initial response
   await store.getUsers()
-  var expired = await store.isCacheExpired()
+  let expired = await store.isCacheExpired()
 
   expect(store.users).toEqual(USER_ARRAY1)
   expect(expired).toBe(false)

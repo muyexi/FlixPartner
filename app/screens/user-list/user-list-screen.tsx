@@ -1,15 +1,13 @@
 import React, { useEffect, useState, useCallback, FC } from "react"
 import { observer } from "mobx-react-lite"
-import { TextStyle, ViewStyle } from "react-native"
+import { TextStyle, ViewStyle, StatusBar } from "react-native"
 import { StackScreenProps } from "@react-navigation/stack"
 import { NavigatorParamList } from "../../navigators"
 import { Screen, Header, TableView } from "../../components"
 import { useStores } from "../../models"
 import { color, spacing } from "../../theme"
-import { TextInput } from "react-native-paper"
+import { TextInput, ActivityIndicator, Colors } from "react-native-paper"
 import { debounce } from "lodash"
-import { StatusBar } from "react-native"
-import { ActivityIndicator, Colors } from "react-native-paper"
 
 const ROOT: ViewStyle = {
   backgroundColor: color.palette.white,
@@ -49,7 +47,7 @@ export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">
 
   async function fetchData() {
     setLoading(true)
-    userStore.getUsers().then((users) => {
+    userStore.getUsers().then(() => {
       setTimeout(() => setLoading(false), 1500)
     })
   }
@@ -64,7 +62,7 @@ export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">
 
   return (
     <Screen style={ROOT} preset="scroll">
-      <StatusBar backgroundColor="blue" barStyle="dark-content" />
+      <StatusBar backgroundColor="white" barStyle="dark-content" />
       <Header
         headerTx="userListScreen.title"
         rightIcon="refresh"
@@ -78,7 +76,7 @@ export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">
         dense={true}
         clearButtonMode="always"
         clearTextOnFocus={true}
-        autoComplete={false}
+        autoComplete="off"
         onChangeText={(text) => {
           setText(text)
           debouncedFilter(text)
@@ -86,7 +84,7 @@ export const UserListScreen: FC<StackScreenProps<NavigatorParamList, "userList">
       />
 
       {loading && <ActivityIndicator animating={true} color={Colors.red800} style={LOADING} />}
-      <TableView list={text == "" ? users : filteredUsers} />
+      <TableView list={text === "" ? users : filteredUsers} />
     </Screen>
   )
 })
