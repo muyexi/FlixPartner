@@ -41,7 +41,7 @@ export const UserStoreModel = types
     saveUsers: (snapshots: UserSnapshot[]) => {
       self.users.replace(snapshots)
     },
-    setQuery(query) {
+    setQuery(query: string) {
       self.query = query
     },
   }))
