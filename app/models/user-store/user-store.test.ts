@@ -1,21 +1,7 @@
 import { ApiClient } from "./../../services/api/api-client"
 import { UserStoreModel } from "./user-store"
-
-const moment = require("moment")
-
-const USER_ARRAY1 = [
-  {
-    name: "Matthew",
-    age: 20,
-  },
-]
-
-const USER_ARRAY2 = [
-  {
-    name: "Alexander",
-    age: 25,
-  },
-]
+import users from "../../../assets/users.json"
+import moment from "moment"
 
 test("can be created", () => {
   const instance = UserStoreModel.create({})
@@ -24,7 +10,10 @@ test("can be created", () => {
 })
 
 test("cache expired after 1 hour", async () => {
-  let mockStaticF = jest.fn().mockReturnValue(USER_ARRAY1)
+  const userArray1 = [users[0]]
+  const userArray2 = [users[1]]
+
+  let mockStaticF = jest.fn().mockReturnValue(userArray1)
   ApiClient.fetchUsers = mockStaticF
   const store = UserStoreModel.create({})
 
@@ -32,7 +21,7 @@ test("cache expired after 1 hour", async () => {
   await store.getUsers()
   let expired = await store.isCacheExpired()
 
-  expect(store.users).toEqual(USER_ARRAY1)
+  expect(store.users).toEqual(userArray1)
   expect(expired).toBe(false)
 
   jest.useFakeTimers("modern").setSystemTime(
@@ -45,7 +34,7 @@ test("cache expired after 1 hour", async () => {
   await store.getUsers()
   expired = await store.isCacheExpired()
 
-  expect(store.users).toEqual(USER_ARRAY1)
+  expect(store.users).toEqual(userArray1)
   expect(expired).toBe(false)
 
   jest.useFakeTimers("modern").setSystemTime(
@@ -58,9 +47,9 @@ test("cache expired after 1 hour", async () => {
   expired = await store.isCacheExpired()
   expect(expired).toBe(true)
 
-  mockStaticF = jest.fn().mockReturnValue(USER_ARRAY2)
+  mockStaticF = jest.fn().mockReturnValue(userArray2)
   ApiClient.fetchUsers = mockStaticF
 
   await store.getUsers()
-  expect(store.users).toEqual(USER_ARRAY2)
+  expect(store.users).toEqual(userArray2)
 })

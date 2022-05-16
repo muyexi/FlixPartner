@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, Key } from "react"
 import { observer } from "mobx-react-lite"
 import { DataTable } from "react-native-paper"
 import { capitalize, isNumber } from "lodash"
@@ -25,6 +25,16 @@ export const TableView = observer(function TableView(props: TableViewProps) {
     }
   })
 
+  function sortList(key: Key) {
+    if (sortDescending == null) {
+      setSortDescending(true)
+    } else {
+      setSortDescending(!sortDescending)
+    }
+
+    setSortKey(key.toString())
+  }
+
   return (
     <DataTable>
       {list.length > 0 && (
@@ -35,13 +45,7 @@ export const TableView = observer(function TableView(props: TableViewProps) {
               numeric={isNumber(value)}
               sortDirection={sortDescending === false ? "ascending" : "descending"}
               onPress={() => {
-                if (sortDescending == null) {
-                  setSortDescending(true)
-                } else {
-                  setSortDescending(!sortDescending)
-                }
-
-                setSortKey(key)
+                sortList(key)
               }}
             >
               {capitalize(key)}

@@ -4,8 +4,7 @@ import { UserModel, UserSnapshot } from "../user/user"
 import { ApiClient } from "../../services/api/api-client"
 import { withEnvironment } from "../extensions/with-environment"
 import { save, load } from "../../utils/storage"
-
-const moment = require("moment")
+import moment from "moment"
 
 export const UserStoreModel = types
   .model("UserStore")
@@ -25,13 +24,17 @@ export const UserStoreModel = types
     },
     isCacheExpired: async () => {
       const timestamp = await load("UserStoreTime")
-      console.log("Timestamp:", timestamp)
 
       if (timestamp) {
         const secondsAgo = moment().diff(moment.unix(timestamp), "seconds")
-        console.log(secondsAgo, "seconds ago")
-
-        return secondsAgo > 60 * 60
+        console.log('cache is' ,secondsAgo, "seconds ago")
+        
+        if (secondsAgo > 60 * 60) {
+          console.log('cache expired')
+          return true
+        } else {
+          return false
+        }
       } else {
         return true
       }
