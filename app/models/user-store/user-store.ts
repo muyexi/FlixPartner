@@ -27,10 +27,10 @@ export const UserStoreModel = types
 
       if (timestamp) {
         const secondsAgo = moment().diff(moment.unix(timestamp), "seconds")
-        console.log('cache is' ,secondsAgo, "seconds ago")
-        
+        console.log("cache is", secondsAgo, "seconds ago")
+
         if (secondsAgo > 60 * 60) {
-          console.log('cache expired')
+          console.log("cache expired")
           return true
         } else {
           return false

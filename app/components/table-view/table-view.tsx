@@ -10,29 +10,55 @@ export interface TableViewProps {
 export const TableView = observer(function TableView(props: TableViewProps) {
   const { list } = props
 
-  const [sortDescending, setSortDescending] = useState<boolean>(null)
   const [sortKey, setSortKey] = useState<string>(null)
+  const [sortDescending, setSortDescending] = useState<boolean>(null)
+  const [sortedList, setSortedList] = useState<any[]>(null)
 
-  const sortedList = list.slice().sort((item1, item2) => {
-    if (sortKey == null) {
-      return 0
+  const pageSize = 10
+  const totalPageNumber = Math.ceil(list.length / pageSize)
+  const [page, setPage] = React.useState<number>(0)
+
+  const pageLabel = () => {
+    return `${page * pageSize + 1}-${pageEndIndex()} of ${list.length}`
+  }
+
+  const pageEndIndex = () => {
+    let endIndex = (page + 1) * pageSize
+    const lastPage = totalPageNumber - 1
+
+    if (page === lastPage) {
+      endIndex = list.length
     }
 
-    if (sortDescending) {
-      return item1[sortKey] < item2[sortKey] ? 1 : -1
-    } else {
-      return item2[sortKey] < item1[sortKey] ? 1 : -1
-    }
-  })
+    return endIndex
+  }
 
-  function sortList(key: Key) {
-    if (sortDescending == null) {
-      setSortDescending(true)
-    } else {
-      setSortDescending(!sortDescending)
-    }
+  const sortList = (key: Key) => {
+    const isSortDescending = sortDescending == null ? true : !sortDescending
+    setSortDescending(isSortDescending)
 
-    setSortKey(key.toString())
+    const newSortKey = key.toString()
+    setSortKey(newSortKey)
+
+    const newList = list.slice().sort((item1, item2) => {
+      if (newSortKey == null) {
+        return 0
+      }
+
+      if (isSortDescending) {
+        return item1[newSortKey] < item2[newSortKey] ? 1 : -1
+      } else {
+        return item2[newSortKey] < item1[newSortKey] ? 1 : -1
+      }
+    })
+    setSortedList(newList)
+  }
+
+  const itemsForPage = () => {
+    const listToUse = sortKey == null ? list : sortedList
+    const startIndex = page * pageSize
+
+    return listToUse.slice(startIndex, pageEndIndex())
   }
 
   return (
@@ -54,7 +80,7 @@ export const TableView = observer(function TableView(props: TableViewProps) {
         </DataTable.Header>
       )}
 
-      {sortedList.map((item, index) => (
+      {itemsForPage().map((item, index) => (
         <DataTable.Row key={index}>
           {Object.values(item).map((value, index) => (
             <DataTable.Cell key={index} numeric={isNumber(value)}>
@@ -63,6 +89,15 @@ export const TableView = observer(function TableView(props: TableViewProps) {
           ))}
         </DataTable.Row>
       ))}
+
+      <DataTable.Pagination
+        page={page}
+        numberOfPages={totalPageNumber}
+        onPageChange={(page) => setPage(page)}
+        label={pageLabel()}
+        numberOfItemsPerPage={pageSize}
+        showFastPaginationControls={true}
+      />
     </DataTable>
   )
 })
